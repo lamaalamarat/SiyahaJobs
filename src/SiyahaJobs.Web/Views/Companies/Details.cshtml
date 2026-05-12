@@ -1,0 +1,70 @@
+@model Company
+@{
+    ViewData["Title"] = Model.Name;
+}
+<section class="page-hero">
+    <div class="container">
+        <a asp-action="Index" class="back-link">← All companies</a>
+        <div class="company-hero">
+            <div class="company-logo big">
+                @if (!string.IsNullOrEmpty(Model.LogoPath))
+                {
+                    <img src="@Model.LogoPath" alt="@Model.Name logo" />
+                }
+                else
+                {
+                    <span>@Model.Name.Substring(0, Math.Min(2, Model.Name.Length)).ToUpper()</span>
+                }
+            </div>
+            <div>
+                <h1>
+                    @Model.Name
+                    @if (Model.IsVerified) { <span class="chip chip-green">Verified</span> }
+                </h1>
+                <p class="muted">@(Model.Industry ?? "Tourism & Hospitality") · @(Model.City?.Name ?? "Jordan")</p>
+                @if (!string.IsNullOrWhiteSpace(Model.Website))
+                {
+                    <p><a href="@Model.Website" target="_blank" rel="noopener">@Model.Website</a></p>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container job-detail-body">
+    <div class="job-body-main">
+        <article class="card">
+            <h3>About</h3>
+            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "This company hasn't added a description yet." : Model.Description)</p>
+        </article>
+
+        <article class="card">
+            <h3>Open positions (@Model.Jobs.Count)</h3>
+            @if (!Model.Jobs.Any())
+            {
+                <p class="muted">No open positions at the moment.</p>
+            }
+            else
+            {
+                <div class="grid grid-jobs">
+                    @foreach (var job in Model.Jobs)
+                    {
+                        <partial name="_JobCardPartial" model="job" />
+                    }
+                </div>
+            }
+        </article>
+    </div>
+
+    <aside class="job-body-side">
+        <div class="card">
+            <h4>Contact</h4>
+            <ul class="overview-list">
+                @if (!string.IsNullOrWhiteSpace(Model.Email)) { <li><span>Email</span><strong>@Model.Email</strong></li> }
+                @if (!string.IsNullOrWhiteSpace(Model.Phone)) { <li><span>Phone</span><strong>@Model.Phone</strong></li> }
+                @if (!string.IsNullOrWhiteSpace(Model.Address)) { <li><span>Address</span><strong>@Model.Address</strong></li> }
+                @if (!string.IsNullOrWhiteSpace(Model.CompanySize)) { <li><span>Size</span><strong>@Model.CompanySize</strong></li> }
+            </ul>
+        </div>
+    </aside>
+</section>

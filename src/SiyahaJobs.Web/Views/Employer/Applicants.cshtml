@@ -1,0 +1,107 @@
+@model List<ApplicantListItemViewModel>
+@{
+    ViewData["Title"] = "Applicants";
+    Layout = "_DashboardLayout";
+    var jobs = ViewBag.Jobs as IReadOnlyList<Job> ?? new List<Job>();
+    int? selectedJobId = ViewBag.JobId as int?;
+    ApplicationStatus? selectedStatus = ViewBag.Status as ApplicationStatus?;
+}
+
+<div class="page-head">
+    <div>
+        <h1>Applicants</h1>
+        <p class="muted">Review, message and schedule interviews with candidates.</p>
+    </div>
+</div>
+
+<form method="get" class="filter-bar card">
+    <div class="form-field">
+        <label>Job</label>
+        <select name="jobId">
+            <option value="">All jobs</option>
+            @foreach (var j in jobs)
+            {
+                <option value="@j.Id" selected="@(selectedJobId == j.Id)">@j.Title</option>
+            }
+        </select>
+    </div>
+    <div class="form-field">
+        <label>Status</label>
+        <select name="status">
+            <option value="">All statuses</option>
+            @foreach (var s in Enum.GetValues<ApplicationStatus>())
+            {
+                <option value="@((int)s)" selected="@(selectedStatus == s)">@s</option>
+            }
+        </select>
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-primary">Apply</button>
+        <a asp-action="Applicants" class="btn btn-outline">Reset</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <h3>No applicants</h3>
+        <p>You'll see candidates here as they apply to your jobs.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Job</th>
+                    <th>Applied</th>
+                    <th>Status</th>
+                    <th>CV</th>
+                    <th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-user">
+                                <div class="avatar sm">
+                                    @if (!string.IsNullOrEmpty(a.AvatarPath))
+                                    { <img src="@a.AvatarPath" alt="avatar" /> }
+                                    else { <span>@a.FullName.Substring(0, 1)</span> }
+                                </div>
+                                <div>
+                                    <div>@a.FullName</div>
+                                    <div class="muted">@a.Headline</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@a.JobTitle</td>
+                        <td class="muted">@a.AppliedAt.ToString("dd MMM yyyy")</td>
+                        <td><span class="status-pill status-@a.Status.ToString().ToLower()">@a.Status</span></td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(a.CvPath))
+                            { <a href="@a.CvPath" target="_blank" class="link">View CV</a> }
+                            else { <span class="muted">—</span> }
+                        </td>
+                        <td class="actions-cell">
+                            <form asp-action="SetApplicationStatus" method="post" class="inline-form">
+                                <input type="hidden" name="id" value="@a.ApplicationId" />
+                                <select name="status" onchange="this.form.submit()" class="mini-select">
+                                    @foreach (var s in Enum.GetValues<ApplicationStatus>())
+                                    {
+                                        <option value="@((int)s)" selected="@(a.Status == s)">@s</option>
+                                    }
+                                </select>
+                            </form>
+                            <a asp-action="ScheduleInterview" asp-route-applicationId="@a.ApplicationId" class="btn btn-outline btn-xs">Interview</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

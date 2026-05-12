@@ -1,0 +1,99 @@
+@model List<AdminUserRowViewModel>
+@{
+    ViewData["Title"] = "Users";
+    Layout = "_DashboardLayout";
+    string? roleFilter = ViewBag.RoleFilter as string;
+    string? search = ViewBag.SearchTerm as string;
+}
+<div class="page-head">
+    <div>
+        <h1>Users</h1>
+        <p class="muted">Manage all accounts on the platform.</p>
+    </div>
+</div>
+
+<form method="get" class="filter-bar card">
+    <div class="form-field">
+        <label>Role</label>
+        <select name="role">
+            <option value="">All roles</option>
+            @foreach (var r in RoleNames.All)
+            {
+                <option value="@r" selected="@(roleFilter == r)">@r</option>
+            }
+        </select>
+    </div>
+    <div class="form-field">
+        <label>Search</label>
+        <input type="text" name="search" value="@search" placeholder="Name or email" />
+    </div>
+    <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">Filter</button>
+        <a asp-action="Users" class="btn btn-outline">Reset</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state"><p>No users match.</p></div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-user">
+                                <div class="avatar sm">
+                                    @if (!string.IsNullOrEmpty(u.AvatarPath))
+                                    { <img src="@u.AvatarPath" alt="avatar" /> }
+                                    else { <span>@u.FullName.Substring(0, 1)</span> }
+                                </div>
+                                <div>@u.FullName</div>
+                            </div>
+                        </td>
+                        <td>@u.Email</td>
+                        <td><span class="chip chip-gray">@u.Role</span></td>
+                        <td><span class="status-pill status-@u.Status.ToString().ToLower()">@u.Status</span></td>
+                        <td class="muted">@u.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td class="actions-cell">
+                            @if (u.Status == AccountStatus.Active)
+                            {
+                                <form asp-action="SetUserStatus" method="post" class="inline-form">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="status" value="@((int)AccountStatus.Suspended)" />
+                                    <button class="btn btn-outline btn-xs">Suspend</button>
+                                </form>
+                                <form asp-action="SetUserStatus" method="post" class="inline-form">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="status" value="@((int)AccountStatus.Banned)" />
+                                    <button class="btn btn-danger btn-xs">Ban</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="SetUserStatus" method="post" class="inline-form">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="status" value="@((int)AccountStatus.Active)" />
+                                    <button class="btn btn-primary btn-xs">Reactivate</button>
+                                </form>
+                            }
+                            <form asp-action="DeleteUser" asp-route-id="@u.Id" method="post" class="inline-form"
+                                  onsubmit="return confirm('Permanently delete this user?');">
+                                <button class="btn btn-danger btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

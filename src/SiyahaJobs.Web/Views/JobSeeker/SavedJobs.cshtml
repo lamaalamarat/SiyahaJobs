@@ -1,0 +1,38 @@
+@model IReadOnlyList<SavedJob>
+@{
+    ViewData["Title"] = "Saved jobs";
+    Layout = "_DashboardLayout";
+}
+
+<div class="page-head">
+    <div>
+        <h1>Saved jobs</h1>
+        <p class="muted">Keep track of opportunities you want to revisit.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <h3>No saved jobs</h3>
+        <p>Tap the bookmark icon on any job to save it for later.</p>
+        <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse jobs</a>
+    </div>
+}
+else
+{
+    <div class="grid grid-jobs">
+        @foreach (var s in Model)
+        {
+            if (s.Job != null)
+            {
+                <div class="saved-job-wrap">
+                    <partial name="_JobCardPartial" model="s.Job" />
+                    <form asp-action="Unsave" asp-route-id="@s.JobId" method="post" class="saved-remove">
+                        <button class="btn btn-outline btn-sm">Remove</button>
+                    </form>
+                </div>
+            }
+        }
+    </div>
+}

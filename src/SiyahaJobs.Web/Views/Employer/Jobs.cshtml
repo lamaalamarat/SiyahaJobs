@@ -1,0 +1,79 @@
+@model IReadOnlyList<Job>
+@{
+    ViewData["Title"] = "My jobs";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>My jobs</h1>
+        <p class="muted">Create, edit and manage your job postings.</p>
+    </div>
+    <a asp-action="CreateJob" class="btn btn-primary">+ Post new job</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <h3>No jobs yet</h3>
+        <p>Post your first job and start receiving applications.</p>
+        <a asp-action="CreateJob" class="btn btn-primary">Post your first job</a>
+    </div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Apps</th>
+                    <th>Views</th>
+                    <th>Deadline</th>
+                    <th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var j in Model)
+                {
+                    <tr>
+                        <td><a asp-controller="Jobs" asp-action="Details" asp-route-id="@j.Id">@j.Title</a></td>
+                        <td>@j.Category?.Name</td>
+                        <td>@(j.City?.Name ?? (j.IsRemote ? "Remote" : "—"))</td>
+                        <td><span class="status-pill status-@j.Status.ToString().ToLower()">@j.Status</span></td>
+                        <td>@j.ApplicationsCount</td>
+                        <td>@j.ViewsCount</td>
+                        <td class="muted">@j.Deadline.ToString("dd MMM yyyy")</td>
+                        <td class="actions-cell">
+                            <a asp-action="EditJob" asp-route-id="@j.Id" class="btn btn-outline btn-xs">Edit</a>
+                            @if (j.Status == JobStatus.Active)
+                            {
+                                <form asp-action="PauseJob" asp-route-id="@j.Id" method="post" class="inline-form">
+                                    <button class="btn btn-outline btn-xs">Pause</button>
+                                </form>
+                            }
+                            else if (j.Status == JobStatus.Paused)
+                            {
+                                <form asp-action="ResumeJob" asp-route-id="@j.Id" method="post" class="inline-form">
+                                    <button class="btn btn-outline btn-xs">Resume</button>
+                                </form>
+                            }
+                            @if (j.Status != JobStatus.Closed)
+                            {
+                                <form asp-action="CloseJob" asp-route-id="@j.Id" method="post" class="inline-form">
+                                    <button class="btn btn-outline btn-xs">Close</button>
+                                </form>
+                            }
+                            <form asp-action="DeleteJob" asp-route-id="@j.Id" method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete this job permanently?');">
+                                <button class="btn btn-danger btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

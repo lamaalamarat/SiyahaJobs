@@ -1,0 +1,139 @@
+@model JobSearchViewModel
+@{
+    ViewData["Title"] = "Find jobs";
+}
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Browse tourism jobs</h1>
+        <p>Find roles across hotels, restaurants, tour operators, transportation and more.</p>
+    </div>
+</section>
+
+<section class="container jobs-grid-wrap">
+    <aside class="filters-sidebar">
+        <form method="get" asp-action="Index">
+            <div class="filter-block">
+                <label>Keyword</label>
+                <input type="text" name="keyword" value="@Model.Keyword" placeholder="Title, skill or company" />
+            </div>
+            <div class="filter-block">
+                <label>Category</label>
+                <select name="categoryId">
+                    <option value="">All categories</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        <option value="@c.Value" selected="@(Model.CategoryId?.ToString() == c.Value)">@c.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-block">
+                <label>City</label>
+                <select name="cityId">
+                    <option value="">All cities</option>
+                    @foreach (var c in Model.Cities)
+                    {
+                        <option value="@c.Value" selected="@(Model.CityId?.ToString() == c.Value)">@c.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-block">
+                <label>Job type</label>
+                <select name="jobType">
+                    <option value="">Any</option>
+                    @foreach (var jt in Enum.GetValues<JobType>())
+                    {
+                        <option value="@((int)jt)" selected="@(Model.JobType == jt)">@jt</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-block">
+                <label>Experience</label>
+                <select name="experienceLevel">
+                    <option value="">Any</option>
+                    @foreach (var el in Enum.GetValues<ExperienceLevel>())
+                    {
+                        <option value="@((int)el)" selected="@(Model.ExperienceLevel == el)">@el</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-block">
+                <label>Min salary (JOD)</label>
+                <input type="number" name="salaryMin" value="@Model.SalaryMin" min="0" />
+            </div>
+            <div class="filter-block check">
+                <label>
+                    <input type="checkbox" name="isRemote" value="true" @(Model.IsRemote == true ? "checked" : "") />
+                    Remote only
+                </label>
+            </div>
+            <div class="filter-block">
+                <label>Sort by</label>
+                <select name="sortBy">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Newest</option>
+                    <option value="salary" selected="@(Model.SortBy == "salary")">Highest salary</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary full">Apply filters</button>
+            <a asp-action="Index" class="btn btn-outline full">Reset</a>
+        </form>
+    </aside>
+
+    <div class="jobs-grid">
+        <div class="results-head">
+            <div><strong>@Model.Results.TotalCount</strong> jobs found</div>
+        </div>
+
+        @if (!Model.Results.Items.Any())
+        {
+            <div class="empty-state card">
+                <h3>No jobs match your filters</h3>
+                <p>Try broadening your criteria or clearing some filters.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-jobs">
+                @foreach (var job in Model.Results.Items)
+                {
+                    <partial name="_JobCardPartial" model="job" />
+                }
+            </div>
+
+            @if (Model.Results.TotalPages > 1)
+            {
+                <nav class="pagination">
+                    @if (Model.Results.HasPrevious)
+                    {
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(Model.Results.Page - 1)"
+                           asp-route-keyword="@Model.Keyword"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-cityId="@Model.CityId"
+                           asp-route-jobType="@((int?)Model.JobType)"
+                           asp-route-experienceLevel="@((int?)Model.ExperienceLevel)"
+                           asp-route-salaryMin="@Model.SalaryMin"
+                           asp-route-isRemote="@Model.IsRemote"
+                           asp-route-sortBy="@Model.SortBy">← Previous</a>
+                    }
+                    <span class="page-info">Page @Model.Results.Page of @Model.Results.TotalPages</span>
+                    @if (Model.Results.HasNext)
+                    {
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@(Model.Results.Page + 1)"
+                           asp-route-keyword="@Model.Keyword"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-cityId="@Model.CityId"
+                           asp-route-jobType="@((int?)Model.JobType)"
+                           asp-route-experienceLevel="@((int?)Model.ExperienceLevel)"
+                           asp-route-salaryMin="@Model.SalaryMin"
+                           asp-route-isRemote="@Model.IsRemote"
+                           asp-route-sortBy="@Model.SortBy">Next →</a>
+                    }
+                </nav>
+            }
+        }
+    </div>
+</section>

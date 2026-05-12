@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Contact";
+}
+<section class="page-hero">
+    <div class="container">
+        <h1>Get in touch</h1>
+        <p>Questions? Feedback? We'd love to hear from you.</p>
+    </div>
+</section>
+
+<section class="container narrow">
+    <div class="card">
+        <form asp-action="Contact" method="post" class="form-grid form-grid-2">
+            <div class="form-field">
+                <label>Full name</label>
+                <input type="text" name="name" required />
+            </div>
+            <div class="form-field">
+                <label>Email</label>
+                <input type="email" name="email" required />
+            </div>
+            <div class="form-field full">
+                <label>Message</label>
+                <textarea name="message" rows="5" required></textarea>
+            </div>
+            <div class="full">
+                <button type="submit" class="btn btn-primary">Send message</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="contact-info">
+        <div>
+            <h5>Email</h5>
+            <p>hello@siyahajobs.jo</p>
+        </div>
+        <div>
+            <h5>Phone</h5>
+            <p>+962 6 000 0000</p>
+        </div>
+        <div>
+            <h5>Location</h5>
+            <p>Amman, Jordan</p>
+        </div>
+    </div>
+</section>

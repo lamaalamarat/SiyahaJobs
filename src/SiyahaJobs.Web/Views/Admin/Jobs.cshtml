@@ -1,0 +1,48 @@
+@model IReadOnlyList<Job>
+@{
+    ViewData["Title"] = "Job moderation";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Jobs awaiting approval</h1>
+        <p class="muted">Review pending submissions before they go live.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <h3>Inbox zero</h3>
+        <p>No jobs pending moderation.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th><th>Company</th><th>Category</th><th>Submitted</th><th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var j in Model)
+                {
+                    <tr>
+                        <td><a asp-controller="Jobs" asp-action="Details" asp-route-id="@j.Id">@j.Title</a></td>
+                        <td>@j.Company?.Name</td>
+                        <td>@j.Category?.Name</td>
+                        <td class="muted">@j.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td class="actions-cell">
+                            <form asp-action="ApproveJob" asp-route-id="@j.Id" method="post" class="inline-form">
+                                <button class="btn btn-primary btn-xs">Approve</button>
+                            </form>
+                            <a asp-action="RejectJob" asp-route-id="@j.Id" class="btn btn-danger btn-xs">Reject</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

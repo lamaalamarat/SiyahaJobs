@@ -1,0 +1,62 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+<section class="auth-wrap">
+    <div class="auth-card">
+        <a asp-controller="Home" asp-action="Index" class="auth-logo">
+            <span class="logo-green">Siyaha</span><span class="logo-navy">Jobs</span><span class="logo-dot">.jo</span>
+        </a>
+
+        <h1>Welcome back</h1>
+        <p class="muted">Sign in to continue building your tourism career.</p>
+
+        <form asp-action="Login" method="post" class="form-stack">
+            <div asp-validation-summary="All" class="form-errors"></div>
+
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="form-field">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" placeholder="you@example.com" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" />
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+
+            <div class="form-row between">
+                <label class="check-inline">
+                    <input asp-for="RememberMe" type="checkbox" />
+                    <span>@Html.DisplayNameFor(m => m.RememberMe)</span>
+                </label>
+                <a asp-action="ForgotPassword" class="link">Forgot password?</a>
+            </div>
+
+            <button class="btn btn-primary full" type="submit">Sign in</button>
+        </form>
+
+        <div class="auth-foot">
+            <span>New to SiyahaJobs?</span>
+            <a asp-action="Register">Create an account →</a>
+        </div>
+    </div>
+    <div class="auth-side">
+        <div class="auth-side-inner">
+            <h2>Your career in Jordan's tourism industry starts here.</h2>
+            <p>Join thousands of professionals finding their next role in hospitality, food service, travel and more.</p>
+            <ul class="auth-bullets">
+                <li>Verified employers across all sectors</li>
+                <li>Smart search tuned for tourism jobs</li>
+                <li>Profile tools built for the industry</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

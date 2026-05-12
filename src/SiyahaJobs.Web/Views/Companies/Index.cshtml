@@ -1,0 +1,52 @@
+@model IReadOnlyList<Company>
+@{
+    ViewData["Title"] = "Companies";
+}
+<section class="page-hero">
+    <div class="container">
+        <h1>Companies</h1>
+        <p>Browse verified employers across Jordan's tourism sector.</p>
+    </div>
+</section>
+
+<section class="container">
+    @if (!Model.Any())
+    {
+        <div class="empty-state card">
+            <h3>No companies yet</h3>
+            <p>Be the first to <a asp-controller="Account" asp-action="Register">register your company</a>.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-companies">
+            @foreach (var c in Model)
+            {
+                <a asp-action="Details" asp-route-id="@c.Id" class="company-card">
+                    <div class="company-card-head">
+                        <div class="company-logo">
+                            @if (!string.IsNullOrEmpty(c.LogoPath))
+                            {
+                                <img src="@c.LogoPath" alt="@c.Name logo" />
+                            }
+                            else
+                            {
+                                <span>@c.Name.Substring(0, Math.Min(2, c.Name.Length)).ToUpper()</span>
+                            }
+                        </div>
+                        @if (c.IsVerified)
+                        {
+                            <span class="chip chip-green">Verified</span>
+                        }
+                    </div>
+                    <h3>@c.Name</h3>
+                    <p class="muted">@(c.Industry ?? "Tourism & Hospitality")</p>
+                    <div class="company-meta">
+                        <span>@(c.City?.Name ?? "Jordan")</span>
+                        <span>· @c.Jobs.Count job@(c.Jobs.Count == 1 ? "" : "s")</span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</section>

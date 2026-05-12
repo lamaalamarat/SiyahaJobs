@@ -1,0 +1,83 @@
+@model CompanyEditorViewModel
+@{
+    ViewData["Title"] = "Company profile";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Company profile</h1>
+        <p class="muted">Tell candidates who you are.</p>
+    </div>
+</div>
+
+<form asp-action="Company" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+    <div class="card">
+        <h3>Basic info</h3>
+        <div class="form-grid form-grid-2">
+            <div class="form-field full">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" />
+                <span asp-validation-for="Name" class="field-error"></span>
+            </div>
+            <div class="form-field full">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" rows="5"></textarea>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="LogoFile"></label>
+                <input asp-for="LogoFile" type="file" accept="image/*" />
+                @if (!string.IsNullOrEmpty(Model.ExistingLogoPath))
+                {
+                    <div class="thumb-preview"><img src="@Model.ExistingLogoPath" alt="logo" /></div>
+                }
+            </div>
+
+            <div class="form-field">
+                <label asp-for="Website"></label>
+                <input asp-for="Website" />
+            </div>
+            <div class="form-field">
+                <label asp-for="Phone"></label>
+                <input asp-for="Phone" />
+            </div>
+            <div class="form-field">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" />
+            </div>
+            <div class="form-field">
+                <label asp-for="Industry"></label>
+                <input asp-for="Industry" />
+            </div>
+            <div class="form-field">
+                <label asp-for="CompanySize"></label>
+                <select asp-for="CompanySize">
+                    <option value="">Select size</option>
+                    <option value="1-10">1-10 employees</option>
+                    <option value="11-50">11-50 employees</option>
+                    <option value="51-200">51-200 employees</option>
+                    <option value="201-500">201-500 employees</option>
+                    <option value="501+">501+ employees</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label asp-for="CityId"></label>
+                <select asp-for="CityId" asp-items="Model.Cities">
+                    <option value="">Select city</option>
+                </select>
+            </div>
+            <div class="form-field full">
+                <label asp-for="Address"></label>
+                <input asp-for="Address" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save company profile</button>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

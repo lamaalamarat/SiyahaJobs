@@ -1,0 +1,53 @@
+@model Job
+<a href="@Url.Action("Details", "Jobs", new { id = Model.Id })" class="job-card">
+    <div class="jc-top">
+        <div class="jc-logo">
+            @if (!string.IsNullOrEmpty(Model.Company?.LogoPath))
+            {
+                <img src="@Model.Company.LogoPath" alt="@Model.Company.Name logo" />
+            }
+            else
+            {
+                @(Model.Company?.Name?.Substring(0, Math.Min(2, Model.Company.Name.Length)).ToUpper() ?? "SJ")
+            }
+        </div>
+        @if ((DateTime.UtcNow - Model.CreatedAt).TotalDays < 5)
+        {
+            <span class="jc-badge badge-new">New</span>
+        }
+        else if (Model.IsUrgent)
+        {
+            <span class="jc-badge badge-urgent">Urgent</span>
+        }
+    </div>
+    <div>
+        <p class="jc-title">@Model.Title</p>
+        <p class="jc-co">@Model.Company?.Name</p>
+    </div>
+    <div class="jc-meta">
+        <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z" />
+                <circle cx="12" cy="10" r="3" />
+            </svg>
+            @(Model.City?.Name ?? (Model.IsRemote ? "Remote" : "Jordan"))
+        </span>
+        <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            @Model.ExperienceLevel
+        </span>
+    </div>
+    <div class="jc-foot">
+        <span class="jc-salary">
+            @if (Model.SalaryMin.HasValue || Model.SalaryMax.HasValue)
+            {
+                @($"{Model.SalaryMin?.ToString("N0")}–{Model.SalaryMax?.ToString("N0")} {Model.Currency}")
+            }
+            else
+            {
+                <text>Competitive</text>
+            }
+        </span>
+        <span class="jc-type">@Model.JobType</span>
+    </div>
+</a>

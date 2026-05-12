@@ -1,0 +1,29 @@
+@{
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+@if (!string.IsNullOrEmpty(success) || !string.IsNullOrEmpty(error))
+{
+    <div class="toast-container">
+        @if (!string.IsNullOrEmpty(success))
+        {
+            <div class="toast toast-success" role="alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>@success</span>
+                <button type="button" class="toast-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="toast toast-error" role="alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                <span>@error</span>
+                <button type="button" class="toast-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>
+            </div>
+        }
+    </div>
+}

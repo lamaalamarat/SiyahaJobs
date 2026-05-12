@@ -1,0 +1,49 @@
+@model CategoryEditorViewModel
+@{
+    ViewData["Title"] = Model.Id == 0 ? "New category" : "Edit category";
+    Layout = "_DashboardLayout";
+    var action = Model.Id == 0 ? "CreateCategory" : "EditCategory";
+}
+<div class="page-head">
+    <div><h1>@ViewData["Title"]</h1></div>
+    <a asp-action="Categories" class="btn btn-outline">← Categories</a>
+</div>
+
+<form asp-action="@action" method="post" class="card">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+    <div class="form-grid form-grid-2">
+        <div class="form-field">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" />
+            <span asp-validation-for="Name" class="field-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="ArabicName"></label>
+            <input asp-for="ArabicName" />
+        </div>
+        <div class="form-field full">
+            <label asp-for="Description"></label>
+            <input asp-for="Description" />
+        </div>
+        <div class="form-field">
+            <label asp-for="IconName"></label>
+            <input asp-for="IconName" placeholder="e.g. utensils, coffee, building" />
+        </div>
+        <div class="form-field">
+            <label asp-for="ImagePath"></label>
+            <input asp-for="ImagePath" placeholder="/uploads/logos/category.png" />
+        </div>
+        <div class="form-field check">
+            <label><input asp-for="IsActive" type="checkbox" /> Active</label>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Categories" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" type="submit">Save</button>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

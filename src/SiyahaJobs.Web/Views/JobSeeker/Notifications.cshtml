@@ -1,0 +1,46 @@
+@model IReadOnlyList<Notification>
+@{
+    ViewData["Title"] = "Notifications";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Notifications</h1>
+        <p class="muted">Your activity updates in one place.</p>
+    </div>
+    @if (Model.Any(n => !n.IsRead))
+    {
+        <form asp-action="MarkAllRead" method="post" class="inline-form">
+            <button class="btn btn-outline">Mark all read</button>
+        </form>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <p>No notifications yet.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <ul class="notif-list">
+            @foreach (var n in Model)
+            {
+                <li class="notif-item @(n.IsRead ? "" : "notif-unread")">
+                    <div class="notif-dot"></div>
+                    <div class="notif-body">
+                        <div class="notif-title">@n.Title</div>
+                        <div class="notif-text">@n.Body</div>
+                        <div class="muted">@n.CreatedAt.ToString("dd MMM yyyy HH:mm")</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(n.ActionUrl))
+                    {
+                        <a href="@n.ActionUrl" class="link">Open →</a>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}

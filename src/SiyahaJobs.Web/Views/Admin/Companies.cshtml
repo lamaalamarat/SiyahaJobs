@@ -1,0 +1,64 @@
+@model IReadOnlyList<Company>
+@{
+    ViewData["Title"] = "Companies";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Companies</h1>
+        <p class="muted">Verify companies and moderate their listings.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state"><p>No companies registered yet.</p></div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Company</th><th>Industry</th><th>City</th><th>Jobs</th><th>Verified</th><th>Joined</th><th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="cell-user">
+                                <div class="avatar sm">
+                                    @if (!string.IsNullOrEmpty(c.LogoPath))
+                                    { <img src="@c.LogoPath" alt="logo" /> }
+                                    else { <span>@c.Name.Substring(0, 1)</span> }
+                                </div>
+                                <div>
+                                    <div><a asp-controller="Companies" asp-action="Details" asp-route-id="@c.Id">@c.Name</a></div>
+                                    <div class="muted">@c.Email</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@c.Industry</td>
+                        <td>@c.City?.Name</td>
+                        <td>@c.Jobs.Count</td>
+                        <td>@(c.IsVerified ? "Yes" : "No")</td>
+                        <td class="muted">@c.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td class="actions-cell">
+                            <form asp-action="SetCompanyVerified" method="post" class="inline-form">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <input type="hidden" name="verified" value="@((!c.IsVerified).ToString().ToLower())" />
+                                <button class="btn btn-outline btn-xs">@(c.IsVerified ? "Unverify" : "Verify")</button>
+                            </form>
+                            <form asp-action="DeleteCompany" asp-route-id="@c.Id" method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete this company and all of its jobs?');">
+                                <button class="btn btn-danger btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

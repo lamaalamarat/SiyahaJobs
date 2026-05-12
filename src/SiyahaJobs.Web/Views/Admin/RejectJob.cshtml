@@ -1,0 +1,33 @@
+@model RejectJobViewModel
+@{
+    ViewData["Title"] = "Reject job";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Reject job</h1>
+        <p class="muted">Please provide a reason — it will be sent to the employer.</p>
+    </div>
+</div>
+
+<form asp-action="RejectJob" method="post" class="card">
+    <input type="hidden" asp-for="JobId" />
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+    <div class="form-field">
+        <label>Job</label>
+        <input type="text" value="@Model.JobTitle" disabled />
+    </div>
+    <div class="form-field">
+        <label asp-for="Reason"></label>
+        <textarea asp-for="Reason" rows="5"></textarea>
+        <span asp-validation-for="Reason" class="field-error"></span>
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Jobs" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-danger" type="submit">Reject job</button>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

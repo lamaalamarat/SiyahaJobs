@@ -1,0 +1,70 @@
+@model IReadOnlyList<JobApplication>
+@{
+    ViewData["Title"] = "My applications";
+    Layout = "_DashboardLayout";
+}
+
+<div class="page-head">
+    <div>
+        <h1>My applications</h1>
+        <p class="muted">Track the status of every job you've applied to.</p>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <h3>No applications yet</h3>
+        <p>You haven't applied to any jobs. <a asp-controller="Jobs" asp-action="Index">Find your first role</a>.</p>
+    </div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Company</th>
+                    <th>Applied</th>
+                    <th>Status</th>
+                    <th>Interview</th>
+                    <th style="width:1%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (a.Job != null)
+                            {
+                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@a.JobId">@a.Job.Title</a>
+                            }
+                            else { <span>-</span> }
+                        </td>
+                        <td>@a.Job?.Company?.Name</td>
+                        <td class="muted">@a.AppliedAt.ToString("dd MMM yyyy")</td>
+                        <td><span class="status-pill status-@a.Status.ToString().ToLower()">@a.Status</span></td>
+                        <td>
+                            @if (a.Interview != null)
+                            {
+                                <span>@a.Interview.ScheduledAt.ToString("dd MMM yyyy HH:mm")</span>
+                            }
+                            else { <span class="muted">–</span> }
+                        </td>
+                        <td>
+                            @if (a.Status != ApplicationStatus.Withdrawn && a.Status != ApplicationStatus.Accepted && a.Status != ApplicationStatus.Rejected)
+                            {
+                                <form asp-action="Withdraw" asp-route-id="@a.Id" method="post" class="inline-form"
+                                      onsubmit="return confirm('Withdraw this application?');">
+                                    <button class="btn btn-outline btn-sm">Withdraw</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

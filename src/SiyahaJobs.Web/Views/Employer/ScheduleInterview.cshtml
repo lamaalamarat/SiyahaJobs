@@ -1,0 +1,43 @@
+@model ScheduleInterviewViewModel
+@{
+    ViewData["Title"] = "Schedule interview";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Schedule interview</h1>
+        <p class="muted">For <strong>@Model.CandidateName</strong> — @Model.JobTitle</p>
+    </div>
+</div>
+
+<form asp-action="ScheduleInterview" method="post" class="card">
+    <input type="hidden" asp-for="ApplicationId" />
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+    <div class="form-grid form-grid-2">
+        <div class="form-field">
+            <label asp-for="ScheduledAt"></label>
+            <input asp-for="ScheduledAt" type="datetime-local" />
+            <span asp-validation-for="ScheduledAt" class="field-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Location"></label>
+            <input asp-for="Location" placeholder="e.g. HQ, 3rd floor meeting room" />
+        </div>
+        <div class="form-field full">
+            <label asp-for="MeetingLink"></label>
+            <input asp-for="MeetingLink" placeholder="https://meet.example.com/..." />
+        </div>
+        <div class="form-field full">
+            <label asp-for="Notes"></label>
+            <textarea asp-for="Notes" rows="4" placeholder="Any instructions for the candidate"></textarea>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Applicants" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" type="submit">Save interview</button>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

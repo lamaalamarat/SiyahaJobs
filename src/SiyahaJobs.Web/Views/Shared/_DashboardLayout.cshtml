@@ -1,0 +1,168 @@
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject INotificationService Notifications
+@{
+    Layout = null;
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+    var primaryRole = roles.FirstOrDefault() ?? "User";
+
+    string area = primaryRole switch
+    {
+        RoleNames.Admin    => "Admin",
+        RoleNames.Employer => "Employer",
+        _                  => "JobSeeker"
+    };
+
+    int unread = 0;
+    if (user != null)
+    {
+        unread = await Notifications.GetUnreadCountAsync(user.Id);
+    }
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] ?? "Dashboard") — SiyahaJobs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="app-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <a href="@Url.Action("Index", "Home")" class="logo-text">
+                <span class="logo-green">Siyaha</span><span class="logo-navy">Jobs</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            @if (area == "Admin")
+            {
+                <a class="sb-link" href="@Url.Action("Index", "Admin")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Users", "Admin")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    <span>Users</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Jobs", "Admin")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                    <span>Jobs moderation</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Companies", "Admin")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg>
+                    <span>Companies</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Categories", "Admin")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+                    <span>Categories</span>
+                </a>
+            }
+            else if (area == "Employer")
+            {
+                <a class="sb-link" href="@Url.Action("Index", "Employer")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Company", "Employer")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h6M9 14h6M9 18h6"/></svg>
+                    <span>Company</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Jobs", "Employer")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                    <span>Jobs</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Applicants", "Employer")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <span>Applicants</span>
+                </a>
+            }
+            else
+            {
+                <a class="sb-link" href="@Url.Action("Index", "JobSeeker")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Profile", "JobSeeker")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>
+                    <span>My Profile</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Applications", "JobSeeker")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Applications</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("SavedJobs", "JobSeeker")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                    <span>Saved jobs</span>
+                </a>
+                <a class="sb-link" href="@Url.Action("Notifications", "JobSeeker")">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <span>Notifications @if (unread > 0) { <span class="sb-badge">@unread</span> }</span>
+                </a>
+            }
+
+            <div class="sb-separator"></div>
+
+            <a class="sb-link" href="@Url.Action("Index", "Home")">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-8H10v8H6a2 2 0 01-2-2V9z"/></svg>
+                <span>Public site</span>
+            </a>
+        </nav>
+    </aside>
+
+    <div class="app-main">
+        <header class="topbar">
+            <button class="sb-toggle" aria-label="Toggle sidebar" onclick="document.body.classList.toggle('sidebar-open')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            </button>
+            <div class="topbar-title">@ViewData["Title"]</div>
+
+            <div class="topbar-actions">
+                @if (area != "Admin")
+                {
+                    <a href="@Url.Action("Notifications", "JobSeeker", new { area = "" })" class="topbar-icon @(area == "JobSeeker" ? "" : "hidden")" title="Notifications">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+                        @if (unread > 0) { <span class="dot"></span> }
+                    </a>
+                }
+
+                <div class="user-menu">
+                    @if (!string.IsNullOrEmpty(user?.AvatarPath))
+                    {
+                        <img class="user-avatar" src="@user.AvatarPath" alt="avatar" />
+                    }
+                    else
+                    {
+                        <div class="user-avatar user-avatar-initial">@((user?.FullName ?? "U").Substring(0, 1).ToUpper())</div>
+                    }
+                    <div class="user-meta">
+                        <div class="user-name">@user?.FullName</div>
+                        <div class="user-role">@primaryRole</div>
+                    </div>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="inline-form">
+                        <button class="btn btn-outline btn-sm" type="submit">Sign out</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <partial name="_ToastPartial" />
+
+        <section class="content">
+            @RenderBody()
+        </section>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

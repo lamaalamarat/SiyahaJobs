@@ -1,0 +1,150 @@
+@model JobDetailsViewModel
+@{
+    ViewData["Title"] = Model.Job.Title;
+    var job = Model.Job;
+}
+
+<section class="job-detail-hero">
+    <div class="container">
+        <a asp-action="Index" class="back-link">← Back to all jobs</a>
+        <div class="job-detail-head">
+            <div class="job-detail-logo">
+                @if (!string.IsNullOrEmpty(job.Company?.LogoPath))
+                {
+                    <img src="@job.Company.LogoPath" alt="@job.Company.Name logo" />
+                }
+                else
+                {
+                    <span>@(job.Company?.Name?.Substring(0, Math.Min(2, job.Company.Name.Length)).ToUpper() ?? "SJ")</span>
+                }
+            </div>
+            <div class="job-detail-info">
+                <h1>@job.Title</h1>
+                <div class="job-detail-meta">
+                    <span><strong>@job.Company?.Name</strong></span>
+                    <span>· @(job.City?.Name ?? (job.IsRemote ? "Remote" : "Jordan"))</span>
+                    <span>· @job.JobType</span>
+                    <span>· @job.ExperienceLevel</span>
+                </div>
+                <div class="job-detail-chips">
+                    @if (job.IsUrgent) { <span class="chip chip-orange">Urgent hire</span> }
+                    @if (job.IsRemote) { <span class="chip chip-green">Remote friendly</span> }
+                    <span class="chip chip-gray">Posted @job.CreatedAt.ToString("dd MMM yyyy")</span>
+                    <span class="chip chip-gray">Closes @job.Deadline.ToString("dd MMM yyyy")</span>
+                </div>
+            </div>
+            <div class="job-detail-actions">
+                @if (User.Identity!.IsAuthenticated && User.IsInRole(RoleNames.JobSeeker))
+                {
+                    if (Model.HasApplied)
+                    {
+                        <button class="btn btn-outline" disabled>Applied</button>
+                    }
+                    else
+                    {
+                        <a asp-action="Apply" asp-route-id="@job.Id" class="btn btn-primary">Apply now</a>
+                    }
+                    <form asp-action="ToggleSave" asp-route-id="@job.Id" method="post" class="inline-form">
+                        <button class="btn btn-outline" type="submit">@(Model.IsSaved ? "Unsave" : "Save job")</button>
+                    </form>
+                }
+                else if (!User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@Url.Action("Details", new { id = job.Id })"
+                       class="btn btn-primary">Sign in to apply</a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container job-detail-body">
+    <div class="job-body-main">
+        <article class="card">
+            <h3>Job description</h3>
+            <div class="job-content">@Html.Raw(System.Net.WebUtility.HtmlEncode(job.Description).Replace("\n", "<br/>"))</div>
+        </article>
+
+        @if (!string.IsNullOrWhiteSpace(job.Responsibilities))
+        {
+            <article class="card">
+                <h3>Responsibilities</h3>
+                <div class="job-content">@Html.Raw(System.Net.WebUtility.HtmlEncode(job.Responsibilities).Replace("\n", "<br/>"))</div>
+            </article>
+        }
+        @if (!string.IsNullOrWhiteSpace(job.Requirements))
+        {
+            <article class="card">
+                <h3>Requirements</h3>
+                <div class="job-content">@Html.Raw(System.Net.WebUtility.HtmlEncode(job.Requirements).Replace("\n", "<br/>"))</div>
+            </article>
+        }
+        @if (!string.IsNullOrWhiteSpace(job.Benefits))
+        {
+            <article class="card">
+                <h3>Benefits</h3>
+                <div class="job-content">@Html.Raw(System.Net.WebUtility.HtmlEncode(job.Benefits).Replace("\n", "<br/>"))</div>
+            </article>
+        }
+    </div>
+
+    <aside class="job-body-side">
+        <div class="card">
+            <h4>Job overview</h4>
+            <ul class="overview-list">
+                <li><span>Salary</span><strong>
+                    @if (job.SalaryMin.HasValue || job.SalaryMax.HasValue)
+                    { @($"{job.SalaryMin?.ToString("N0")}–{job.SalaryMax?.ToString("N0")} {job.Currency}") }
+                    else { <text>Competitive</text> }
+                </strong></li>
+                <li><span>Vacancies</span><strong>@job.Vacancies</strong></li>
+                <li><span>Category</span><strong>@job.Category?.Name</strong></li>
+                <li><span>Location</span><strong>@(job.City?.Name ?? "Jordan")</strong></li>
+                <li><span>Views</span><strong>@job.ViewsCount</strong></li>
+                <li><span>Applicants</span><strong>@job.ApplicationsCount</strong></li>
+            </ul>
+        </div>
+
+        @if (job.Company != null)
+        {
+            <div class="card">
+                <h4>About the company</h4>
+                <a asp-controller="Companies" asp-action="Details" asp-route-id="@job.Company.Id" class="company-mini">
+                    <div class="jc-logo">
+                        @if (!string.IsNullOrEmpty(job.Company.LogoPath))
+                        {
+                            <img src="@job.Company.LogoPath" alt="@job.Company.Name logo" />
+                        }
+                        else
+                        {
+                            @(job.Company.Name.Substring(0, Math.Min(2, job.Company.Name.Length)).ToUpper())
+                        }
+                    </div>
+                    <div>
+                        <div class="company-name">@job.Company.Name</div>
+                        <div class="company-sub">@job.Company.Industry</div>
+                    </div>
+                </a>
+                <p class="company-desc">@job.Company.Description</p>
+            </div>
+        }
+    </aside>
+</section>
+
+@if (Model.RelatedJobs.Any())
+{
+    <section class="sec sec-bg">
+        <div class="container">
+            <div class="sec-hd">
+                <div class="sec-hd-left"><h2>Related jobs</h2></div>
+            </div>
+            <div class="grid grid-jobs">
+                @foreach (var related in Model.RelatedJobs)
+                {
+                    <partial name="_JobCardPartial" model="related" />
+                }
+            </div>
+        </div>
+    </section>
+}

@@ -1,0 +1,274 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    var jobsByCategory = ViewBag.JobsByCategory as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<!-- HERO -->
+<div class="hero-wrap">
+    <div class="hero-left">
+        <h1>Your Future<br />Starts <span class="accent">Here.</span></h1>
+        <p class="sub">
+            Find real opportunities. Grow your skills.<br />
+            Build your career in Jordan's tourism industry.
+        </p>
+    </div>
+    <div class="hero-strips">
+        <div class="strip" style="background-image: linear-gradient(135deg, #194870, #1F9E78); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #0f2230, #194870); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #1F9E78, #0f7a4b); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #194870, #0f2230); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #1c4c74, #20a475); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #0f2230, #1F9E78); background-position: 50% center;"></div>
+        <div class="strip" style="background-image: linear-gradient(135deg, #1F9E78, #194870); background-position: 50% center;"></div>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+    <form class="search-card" asp-controller="Jobs" asp-action="Index" method="get">
+        <div class="sf">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input type="text" name="keyword" placeholder="Job title, keywords or skills" />
+        </div>
+        <div class="sf">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z" /><circle cx="12" cy="10" r="3" />
+            </svg>
+            <select name="cityId">
+                <option value="">All locations</option>
+                @foreach (var c in Model.Cities)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </select>
+        </div>
+        <div class="sf">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+            </svg>
+            <select name="categoryId">
+                <option value="">All departments</option>
+                @foreach (var cat in Model.Categories)
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Search Jobs</button>
+    </form>
+</div>
+
+<!-- CATEGORIES -->
+<section class="sec container">
+    <div class="sec-hd">
+        <div class="sec-hd-left">
+            <h2>Explore Opportunities in Tourism &amp; Hospitality</h2>
+            <p>Discover jobs across all tourism sectors in Jordan.</p>
+        </div>
+        <a class="view-all" asp-controller="Jobs" asp-action="Index">View all →</a>
+    </div>
+    <div class="slider-outer">
+        <button type="button" class="sl-btn prev" onclick="slide('cats', -1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <div class="slider-track" id="cats">
+            @foreach (var cat in Model.Categories)
+            {
+                var count = jobsByCategory.TryGetValue(cat.Id, out var n) ? n : 0;
+                <a asp-controller="Jobs" asp-action="Index" asp-route-categoryId="@cat.Id" class="cat-card">
+                    <div class="cat-top">
+                        <h4>@cat.Name</h4>
+                        @if (!string.IsNullOrEmpty(cat.ArabicName))
+                        {
+                            <h6>@cat.ArabicName</h6>
+                        }
+                        <span class="cat-count">@count Jobs</span>
+                        <div class="cat-icon-box">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="2" y="7" width="20" height="14" rx="2" />
+                                <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="cat-img" style="background: linear-gradient(135deg, #194870, #1F9E78);"></div>
+                </a>
+            }
+        </div>
+        <button type="button" class="sl-btn next" onclick="slide('cats', 1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+    </div>
+</section>
+
+<!-- INSIGHTS BAR -->
+<div class="insights-bar">
+    <div class="container">
+        <div class="insights-row">
+            <div class="ins-label">
+                <p class="tl">Tourism Insights</p>
+                <p>Latest updates from the industry</p>
+            </div>
+            <div class="ins-stats">
+                <div class="ins-stat">
+                    <svg class="ins-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z" /><circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <div>
+                        <p class="ins-k">Top Hiring City</p>
+                        <p class="ins-v">@Model.TopHiringCity</p>
+                    </div>
+                </div>
+                <div class="ins-stat">
+                    <svg class="ins-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                    </svg>
+                    <div>
+                        <p class="ins-k">Most Demanded Skill</p>
+                        <p class="ins-v">@Model.MostDemandedSkill</p>
+                    </div>
+                </div>
+                <div class="ins-stat">
+                    <svg class="ins-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
+                    </svg>
+                    <div>
+                        <p class="ins-k">Active Companies</p>
+                        <p class="ins-v">@Model.TotalCompanies</p>
+                    </div>
+                </div>
+                <div class="ins-stat">
+                    <svg class="ins-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    <div>
+                        <p class="ins-k">High Demand Season</p>
+                        <p class="ins-v">@Model.HighDemandSeason</p>
+                    </div>
+                </div>
+            </div>
+            <div class="ins-cta">
+                <a asp-controller="Jobs" asp-action="Index">Explore all →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURED JOBS -->
+<section class="sec sec-bg">
+    <div class="container">
+        <div class="sec-hd">
+            <div class="sec-hd-left">
+                <h2>Featured Jobs</h2>
+                <p>Hand-picked opportunities from top employers.</p>
+            </div>
+            <a class="view-all" asp-controller="Jobs" asp-action="Index">View all →</a>
+        </div>
+
+        @if (!Model.FeaturedJobs.Any())
+        {
+            <div class="empty-state">
+                <p>No featured jobs yet. <a asp-controller="Jobs" asp-action="Index">Browse all jobs →</a></p>
+            </div>
+        }
+        else
+        {
+            <div class="slider-outer">
+                <button type="button" class="sl-btn prev" onclick="slide('jobs', -1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <div class="slider-track" id="jobs">
+                    @foreach (var job in Model.FeaturedJobs)
+                    {
+                        <partial name="_JobCardPartial" model="job" />
+                    }
+                </div>
+                <button type="button" class="sl-btn next" onclick="slide('jobs', 1)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- CAREER JOURNEY -->
+<section class="sec">
+    <div class="container">
+        <div class="journey-wrap">
+            <div class="journey-txt">
+                <h2>A Career Journey with No Limits</h2>
+                <p>
+                    Explore standards and pathways that help you grow and succeed
+                    in the tourism industry.
+                </p>
+                <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse all jobs</a>
+            </div>
+            <div class="journey-stats">
+                <div class="stat-card">
+                    <div class="stat-v">@Model.TotalActiveJobs</div>
+                    <div class="stat-k">Active jobs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-v">@Model.TotalCompanies</div>
+                    <div class="stat-k">Companies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-v">@Model.TotalJobSeekers</div>
+                    <div class="stat-k">Job seekers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-v">@Model.Categories.Count</div>
+                    <div class="stat-k">Sectors</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (Model.Partners.Any())
+{
+    <!-- PARTNERS -->
+    <section class="sec sec-bg">
+        <div class="container">
+            <div class="sec-hd" style="justify-content:center;text-align:center;">
+                <div class="sec-hd-left" style="width:100%;">
+                    <h2>Trusted by Leading Partners</h2>
+                </div>
+            </div>
+            <div class="slider-outer">
+                <div class="slider-track" style="justify-content:center;">
+                    @foreach (var p in Model.Partners)
+                    {
+                        <div class="partner-logo" title="@p.Name">
+                            @if (!string.IsNullOrEmpty(p.LogoPath))
+                            {
+                                <img src="@p.LogoPath" alt="@p.Name" />
+                            }
+                            else
+                            {
+                                <span>@p.Name</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        function slide(id, dir) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var card = el.querySelector('.cat-card, .job-card, .partner-logo');
+            var w = card ? card.offsetWidth + 14 : 300;
+            el.scrollBy({ left: dir * w * 2, behavior: 'smooth' });
+        }
+    </script>
+}

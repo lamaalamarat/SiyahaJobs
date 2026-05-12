@@ -1,0 +1,117 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin dashboard";
+    Layout = "_DashboardLayout";
+    var s = Model.Stats;
+    string J(IEnumerable<ChartPoint> pts, Func<ChartPoint, string> sel) =>
+        string.Join(",", pts.Select(p => sel(p)));
+    var jobLabels = "\"" + string.Join("\",\"", s.JobsPerMonth.Select(p => p.Label)) + "\"";
+    var jobVals = J(s.JobsPerMonth, p => p.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    var userLabels = "\"" + string.Join("\",\"", s.UsersPerMonth.Select(p => p.Label)) + "\"";
+    var userVals = J(s.UsersPerMonth, p => p.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    var appLabels = "\"" + string.Join("\",\"", s.ApplicationsPerMonth.Select(p => p.Label)) + "\"";
+    var appVals = J(s.ApplicationsPerMonth, p => p.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    var catLabels = "\"" + string.Join("\",\"", s.TopCategories.Select(p => p.Label)) + "\"";
+    var catVals = J(s.TopCategories, p => p.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+}
+<div class="page-head">
+    <div>
+        <h1>Platform overview</h1>
+        <p class="muted">Real-time metrics for the SiyahaJobs ecosystem.</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card"><div><div class="stat-v">@s.TotalUsers</div><div class="stat-k">Total users</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.TotalJobSeekers</div><div class="stat-k">Job seekers</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.TotalEmployers</div><div class="stat-k">Employers</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.TotalCompanies</div><div class="stat-k">Companies</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.ActiveJobs</div><div class="stat-k">Active jobs</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.PendingJobs</div><div class="stat-k">Pending jobs</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.TotalApplications</div><div class="stat-k">Applications</div></div></div>
+    <div class="stat-card"><div><div class="stat-v">@s.NewUsersThisWeek</div><div class="stat-k">New users / week</div></div></div>
+</div>
+
+<div class="charts-grid">
+    <div class="card">
+        <div class="card-head"><h3>Jobs per month</h3></div>
+        <canvas id="chartJobs" height="120"></canvas>
+    </div>
+    <div class="card">
+        <div class="card-head"><h3>New users per month</h3></div>
+        <canvas id="chartUsers" height="120"></canvas>
+    </div>
+    <div class="card">
+        <div class="card-head"><h3>Applications per month</h3></div>
+        <canvas id="chartApps" height="120"></canvas>
+    </div>
+    <div class="card">
+        <div class="card-head"><h3>Top categories</h3></div>
+        <canvas id="chartCats" height="120"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <h3>Pending job approvals (@Model.PendingJobs.Count)</h3>
+        <a asp-action="Jobs" class="link">Review all →</a>
+    </div>
+    @if (!Model.PendingJobs.Any())
+    {
+        <div class="empty-inline">No pending jobs.</div>
+    }
+    else
+    {
+        <table class="table">
+            <thead><tr><th>Title</th><th>Company</th><th>Submitted</th><th style="width:1%;">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var j in Model.PendingJobs.Take(5))
+                {
+                    <tr>
+                        <td><a asp-controller="Jobs" asp-action="Details" asp-route-id="@j.Id">@j.Title</a></td>
+                        <td>@j.Company?.Name</td>
+                        <td class="muted">@j.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td class="actions-cell">
+                            <form asp-action="ApproveJob" asp-route-id="@j.Id" method="post" class="inline-form">
+                                <button class="btn btn-primary btn-xs">Approve</button>
+                            </form>
+                            <a asp-action="RejectJob" asp-route-id="@j.Id" class="btn btn-danger btn-xs">Reject</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            const green = '#1F9E78';
+            const navy  = '#194870';
+            function line(id, labels, values, color) {
+                const ctx = document.getElementById(id);
+                if (!ctx) return;
+                new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets: [{ data: values, borderColor: color, backgroundColor: color+'22', tension: 0.3, fill: true, borderWidth: 2, pointRadius: 3 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } } }
+                });
+            }
+            function bar(id, labels, values, color) {
+                const ctx = document.getElementById(id);
+                if (!ctx) return;
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ data: values, backgroundColor: color }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, indexAxis: 'y' }
+                });
+            }
+            line('chartJobs',  [@Html.Raw(jobLabels)],  [@Html.Raw(jobVals)],  green);
+            line('chartUsers', [@Html.Raw(userLabels)], [@Html.Raw(userVals)], navy);
+            line('chartApps',  [@Html.Raw(appLabels)],  [@Html.Raw(appVals)],  green);
+            bar('chartCats',   [@Html.Raw(catLabels)],  [@Html.Raw(catVals)],  navy);
+        })();
+    </script>
+}

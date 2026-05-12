@@ -1,0 +1,115 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create account";
+}
+<section class="auth-wrap">
+    <div class="auth-card">
+        <a asp-controller="Home" asp-action="Index" class="auth-logo">
+            <span class="logo-green">Siyaha</span><span class="logo-navy">Jobs</span><span class="logo-dot">.jo</span>
+        </a>
+
+        <h1>Create your account</h1>
+        <p class="muted">Choose the account type that matches your goal.</p>
+
+        <div class="role-toggle" role="tablist">
+            <label class="role-opt">
+                <input type="radio" name="Role" value="JobSeeker" checked="@(Model.Role == "JobSeeker")" />
+                <div class="role-body">
+                    <div class="role-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>
+                    </div>
+                    <div class="role-meta">
+                        <strong>Job Seeker</strong>
+                        <span>Find jobs, apply, and get hired.</span>
+                    </div>
+                </div>
+            </label>
+            <label class="role-opt">
+                <input type="radio" name="Role" value="Employer" checked="@(Model.Role == "Employer")" />
+                <div class="role-body">
+                    <div class="role-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h6M9 14h6"/></svg>
+                    </div>
+                    <div class="role-meta">
+                        <strong>Employer</strong>
+                        <span>Post jobs and hire great talent.</span>
+                    </div>
+                </div>
+            </label>
+        </div>
+
+        <form asp-action="Register" method="post" class="form-stack" id="registerForm">
+            <div asp-validation-summary="All" class="form-errors"></div>
+
+            <div class="form-field">
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" />
+                <span asp-validation-for="FullName" class="field-error"></span>
+            </div>
+
+            <div class="form-grid form-grid-2">
+                <div class="form-field">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" />
+                    <span asp-validation-for="Email" class="field-error"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="PhoneNumber"></label>
+                    <input asp-for="PhoneNumber" />
+                    <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-field employer-only @(Model.Role == "Employer" ? "" : "hidden")" id="companyField">
+                <label asp-for="CompanyName"></label>
+                <input asp-for="CompanyName" placeholder="e.g. Petra Grand Hotel" />
+                <span asp-validation-for="CompanyName" class="field-error"></span>
+            </div>
+
+            <div class="form-grid form-grid-2">
+                <div class="form-field">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" />
+                    <span asp-validation-for="Password" class="field-error"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="ConfirmPassword"></label>
+                    <input asp-for="ConfirmPassword" />
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary full" type="submit">Create account</button>
+        </form>
+
+        <div class="auth-foot">
+            <span>Already have an account?</span>
+            <a asp-action="Login">Sign in →</a>
+        </div>
+    </div>
+    <div class="auth-side">
+        <div class="auth-side-inner">
+            <h2>Built for Jordan's tourism talent &amp; employers.</h2>
+            <p>SiyahaJobs is the dedicated platform where hotels, restaurants, tour operators and travel companies meet skilled professionals.</p>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var radios = document.querySelectorAll('input[name="Role"]');
+            var companyField = document.getElementById('companyField');
+            radios.forEach(function (r) {
+                r.addEventListener('change', function () {
+                    if (document.querySelector('input[name="Role"]:checked').value === 'Employer') {
+                        companyField.classList.remove('hidden');
+                    } else {
+                        companyField.classList.add('hidden');
+                    }
+                });
+            });
+        })();
+    </script>
+}

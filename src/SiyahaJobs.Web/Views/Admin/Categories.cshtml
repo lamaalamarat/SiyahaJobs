@@ -1,0 +1,36 @@
+@model IReadOnlyList<Category>
+@{
+    ViewData["Title"] = "Categories";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Tourism categories</h1>
+        <p class="muted">Manage the industries displayed on the homepage.</p>
+    </div>
+    <a asp-action="CreateCategory" class="btn btn-primary">+ New category</a>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead><tr><th>Name</th><th>Arabic</th><th>Icon</th><th>Status</th><th style="width:1%;">Actions</th></tr></thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.Name</td>
+                    <td>@c.ArabicName</td>
+                    <td class="muted">@c.IconName</td>
+                    <td>@(c.IsActive ? "Active" : "Hidden")</td>
+                    <td class="actions-cell">
+                        <a asp-action="EditCategory" asp-route-id="@c.Id" class="btn btn-outline btn-xs">Edit</a>
+                        <form asp-action="DeleteCategory" asp-route-id="@c.Id" method="post" class="inline-form"
+                              onsubmit="return confirm('Delete this category?');">
+                            <button class="btn btn-danger btn-xs">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
