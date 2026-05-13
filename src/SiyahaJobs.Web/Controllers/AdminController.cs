@@ -16,15 +16,21 @@ public class AdminController : Controller
     private readonly IAdminService _admin;
     private readonly ICompanyService _companies;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IFileUploadService _uploads;
+    private readonly SiyahaJobs.Web.Repositories.Interfaces.IUnitOfWork _uow;
 
     public AdminController(
         IAdminService admin,
         ICompanyService companies,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IFileUploadService uploads,
+        SiyahaJobs.Web.Repositories.Interfaces.IUnitOfWork uow)
     {
         _admin = admin;
         _companies = companies;
         _userManager = userManager;
+        _uploads = uploads;
+        _uow = uow;
     }
 
     // ---------------------------------------------------------------------
@@ -205,5 +211,107 @@ public class AdminController : Controller
         var result = await _admin.DeleteCategoryAsync(id);
         TempData[result.Success ? "Success" : "Error"] = result.Message;
         return RedirectToAction(nameof(Categories));
+    }
+
+    // ---------------------------------------------------------------------
+    // Partners (homepage logos)
+    // ---------------------------------------------------------------------
+    public async Task<IActionResult> Partners()
+    {
+        var items = (await _uow.Partners.ListAllAsync())
+            .OrderBy(p => p.DisplayOrder).ThenBy(p => p.Name)
+            .ToList();
+        return View(items);
+    }
+
+    [HttpGet]
+    public IActionResult CreatePartner() =>
+        View("PartnerEditor", new PartnerEditorViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreatePartner(PartnerEditorViewModel model)
+    {
+        if (!ModelState.IsValid) return View("PartnerEditor", model);
+
+        string? logoPath = null;
+        if (model.LogoFile != null)
+        {
+            var up = await _uploads.UploadAsync(model.LogoFile, UploadKind.Logo);
+            if (!up.Success)
+            {
+                ModelState.AddModelError(nameof(model.LogoFile), up.Message ?? "Upload failed.");
+                return View("PartnerEditor", model);
+            }
+            logoPath = up.Data;
+        }
+
+        await _uow.Partners.AddAsync(new Models.Entities.Partner
+        {
+            Name = model.Name,
+            Website = model.Website,
+            LogoPath = logoPath ?? model.ExistingLogoPath ?? "/uploads/logos/partner-placeholder.png",
+            DisplayOrder = model.DisplayOrder,
+            IsActive = model.IsActive
+        });
+        await _uow.SaveChangesAsync();
+        TempData["Success"] = "Partner added.";
+        return RedirectToAction(nameof(Partners));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditPartner(int id)
+    {
+        var p = await _uow.Partners.GetByIdAsync(id);
+        if (p == null) return NotFound();
+
+        return View("PartnerEditor", new PartnerEditorViewModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Website = p.Website,
+            ExistingLogoPath = p.LogoPath,
+            DisplayOrder = p.DisplayOrder,
+            IsActive = p.IsActive
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditPartner(PartnerEditorViewModel model)
+    {
+        if (!ModelState.IsValid) return View("PartnerEditor", model);
+
+        var existing = await _uow.Partners.GetByIdAsync(model.Id);
+        if (existing == null) return NotFound();
+
+        if (model.LogoFile != null)
+        {
+            var up = await _uploads.UploadAsync(model.LogoFile, UploadKind.Logo);
+            if (up.Success)
+            {
+                _uploads.DeleteIfExists(existing.LogoPath);
+                existing.LogoPath = up.Data!;
+            }
+        }
+        existing.Name = model.Name;
+        existing.Website = model.Website;
+        existing.DisplayOrder = model.DisplayOrder;
+        existing.IsActive = model.IsActive;
+        _uow.Partners.Update(existing);
+        await _uow.SaveChangesAsync();
+
+        TempData["Success"] = "Partner updated.";
+        return RedirectToAction(nameof(Partners));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeletePartner(int id)
+    {
+        var p = await _uow.Partners.GetByIdAsync(id);
+        if (p == null) return NotFound();
+        _uploads.DeleteIfExists(p.LogoPath);
+        _uow.Partners.Remove(p);
+        await _uow.SaveChangesAsync();
+        TempData["Success"] = "Partner deleted.";
+        return RedirectToAction(nameof(Partners));
     }
 }

@@ -29,6 +29,12 @@ public static class DatabaseSeeder
         await SeedCountriesAndCitiesAsync(db);
         await SeedCategoriesAsync(db);
         await SeedPartnersAsync(db);
+
+        // Demo data (jobs, employers, seekers) — only on fresh databases.
+        if (configuration.GetValue<bool>("SeedDemoData", true))
+        {
+            await DemoDataSeeder.SeedAsync(services);
+        }
     }
 
     // ---------------------------------------------------------------------

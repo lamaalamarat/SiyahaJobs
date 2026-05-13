@@ -1,0 +1,53 @@
+@model List<Partner>
+@{
+    ViewData["Title"] = "Partners";
+    Layout = "_DashboardLayout";
+}
+<div class="page-head">
+    <div>
+        <h1>Homepage partners</h1>
+        <p class="muted">Logos shown in the "Trusted by Leading Partners" strip.</p>
+    </div>
+    <a asp-action="CreatePartner" class="btn btn-primary">+ New partner</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state"><p>No partners yet.</p></div>
+}
+else
+{
+    <div class="card">
+        <table class="table">
+            <thead><tr><th>Logo</th><th>Name</th><th>Order</th><th>Status</th><th style="width:1%;">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="avatar sm" style="border-radius:8px;background:#fff;border:1px solid #e4ebf0;">
+                                @if (!string.IsNullOrEmpty(p.LogoPath))
+                                { <img src="@p.LogoPath" alt="@p.Name logo" style="object-fit:contain;" /> }
+                                else { <span>@p.Name.Substring(0, 1)</span> }
+                            </div>
+                        </td>
+                        <td>
+                            <div>@p.Name</div>
+                            @if (!string.IsNullOrEmpty(p.Website))
+                            { <div class="muted"><a href="@p.Website" target="_blank" rel="noopener">@p.Website</a></div> }
+                        </td>
+                        <td>@p.DisplayOrder</td>
+                        <td>@(p.IsActive ? "Active" : "Hidden")</td>
+                        <td class="actions-cell">
+                            <a asp-action="EditPartner" asp-route-id="@p.Id" class="btn btn-outline btn-xs">Edit</a>
+                            <form asp-action="DeletePartner" asp-route-id="@p.Id" method="post" class="inline-form"
+                                  onsubmit="return confirm('Delete this partner?');">
+                                <button class="btn btn-danger btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

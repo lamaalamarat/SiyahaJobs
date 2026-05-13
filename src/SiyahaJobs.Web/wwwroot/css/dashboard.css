@@ -561,3 +561,110 @@
     .sb-toggle { display: inline-flex; }
     .content { padding: 18px; }
 }
+
+
+/* ==========================================================================
+   MESSAGING
+   ========================================================================== */
+.convo-list {
+    padding: 0;
+}
+.convo-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f7;
+    color: inherit;
+    transition: background 0.15s;
+}
+.convo-item:last-child { border-bottom: none; }
+.convo-item:hover { background: #f9fbfc; }
+.convo-body { flex: 1; min-width: 0; }
+.convo-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.convo-top strong { color: var(--ink); font-size: 0.94rem; }
+.convo-top .muted { font-size: 0.76rem; white-space: nowrap; }
+.convo-preview {
+    color: var(--ink-soft);
+    font-size: 0.84rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+.thread-wrap {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 220px);
+    min-height: 400px;
+    overflow: hidden;
+}
+.thread-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fafcfd;
+}
+.msg-row {
+    display: flex;
+}
+.msg-row.msg-mine { justify-content: flex-end; }
+.msg-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.msg-mine .msg-bubble {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    color: #fff;
+}
+.msg-subject {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+.msg-meta {
+    font-size: 0.7rem;
+    margin-top: 4px;
+    color: var(--ink-soft);
+}
+.msg-mine .msg-meta { color: rgba(255, 255, 255, 0.85); }
+
+.thread-compose {
+    border-top: 1px solid var(--border);
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+.thread-compose textarea {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: none;
+}
+.thread-compose textarea:focus {
+    outline: none;
+    border-color: var(--emerald);
+    box-shadow: 0 0 0 3px rgba(31, 158, 120, 0.15);
+}

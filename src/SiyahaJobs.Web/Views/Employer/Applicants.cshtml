@@ -98,6 +98,7 @@ else
                                 </select>
                             </form>
                             <a asp-action="ScheduleInterview" asp-route-applicationId="@a.ApplicationId" class="btn btn-outline btn-xs">Interview</a>
+                            <a asp-controller="Messages" asp-action="Thread" asp-route-otherUserId="@a.JobSeekerUserId" class="btn btn-outline btn-xs">Message</a>
                         </td>
                     </tr>
                 }

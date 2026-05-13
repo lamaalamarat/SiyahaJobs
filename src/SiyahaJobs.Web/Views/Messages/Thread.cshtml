@@ -1,0 +1,56 @@
+@model MessageThreadViewModel
+@{
+    ViewData["Title"] = $"Chat · {Model.OtherUserName}";
+    Layout = "_DashboardLayout";
+    var myId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+}
+
+<div class="page-head">
+    <div>
+        <a asp-action="Index" class="back-link">← All messages</a>
+        <h1>@Model.OtherUserName</h1>
+    </div>
+</div>
+
+<div class="card thread-wrap">
+    <div class="thread-messages" id="threadMessages">
+        @if (!Model.Messages.Any())
+        {
+            <div class="empty-inline">Say hello — this is the start of your conversation.</div>
+        }
+        else
+        {
+            foreach (var m in Model.Messages)
+            {
+                var mine = m.SenderId == myId;
+                <div class="msg-row @(mine ? "msg-mine" : "msg-theirs")">
+                    <div class="msg-bubble">
+                        @if (!string.IsNullOrWhiteSpace(m.Subject))
+                        { <div class="msg-subject">@m.Subject</div> }
+                        <div class="msg-body">@m.Body</div>
+                        <div class="msg-meta">@m.SentAt.ToString("dd MMM HH:mm")</div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <form asp-action="Send" method="post" class="thread-compose">
+        <input type="hidden" name="ReceiverId" value="@Model.Compose.ReceiverId" />
+        @if (Model.Compose.JobId.HasValue)
+        {
+            <input type="hidden" name="JobId" value="@Model.Compose.JobId" />
+        }
+        <textarea name="Body" rows="2" placeholder="Write a message…" required></textarea>
+        <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var el = document.getElementById('threadMessages');
+            if (el) el.scrollTop = el.scrollHeight;
+        })();
+    </script>
+}

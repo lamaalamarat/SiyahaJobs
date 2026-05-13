@@ -1,0 +1,50 @@
+@model PartnerEditorViewModel
+@{
+    ViewData["Title"] = Model.Id == 0 ? "New partner" : "Edit partner";
+    Layout = "_DashboardLayout";
+    var action = Model.Id == 0 ? "CreatePartner" : "EditPartner";
+}
+<div class="page-head">
+    <div><h1>@ViewData["Title"]</h1></div>
+    <a asp-action="Partners" class="btn btn-outline">← Partners</a>
+</div>
+
+<form asp-action="@action" method="post" enctype="multipart/form-data" class="card">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ExistingLogoPath" />
+    <div asp-validation-summary="ModelOnly" class="form-errors"></div>
+
+    <div class="form-grid form-grid-2">
+        <div class="form-field">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" />
+            <span asp-validation-for="Name" class="field-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Website"></label>
+            <input asp-for="Website" />
+        </div>
+        <div class="form-field">
+            <label asp-for="DisplayOrder"></label>
+            <input asp-for="DisplayOrder" type="number" min="0" />
+        </div>
+        <div class="form-field check">
+            <label><input asp-for="IsActive" type="checkbox" /> Active</label>
+        </div>
+        <div class="form-field full">
+            <label asp-for="LogoFile"></label>
+            <input asp-for="LogoFile" type="file" accept="image/*" />
+            @if (!string.IsNullOrEmpty(Model.ExistingLogoPath))
+            {
+                <div class="thumb-preview"><img src="@Model.ExistingLogoPath" alt="logo" /></div>
+            }
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a asp-action="Partners" class="btn btn-outline">Cancel</a>
+        <button class="btn btn-primary" type="submit">Save partner</button>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

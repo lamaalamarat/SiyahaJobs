@@ -5,6 +5,7 @@ namespace SiyahaJobs.Web.ViewModels.Employer;
 public class ApplicantListItemViewModel
 {
     public int ApplicationId { get; set; }
+    public string JobSeekerUserId { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string JobTitle { get; set; } = string.Empty;
@@ -20,6 +21,7 @@ public class ApplicantListItemViewModel
     public static ApplicantListItemViewModel FromEntity(JobApplication a) => new()
     {
         ApplicationId = a.Id,
+        JobSeekerUserId = a.JobSeekerUserId,
         FullName = a.JobSeeker?.FullName ?? "Applicant",
         Email = a.JobSeeker?.Email,
         JobTitle = a.Job?.Title ?? string.Empty,

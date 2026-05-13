@@ -1,0 +1,46 @@
+@model ConversationListViewModel
+@{
+    ViewData["Title"] = "Messages";
+    Layout = "_DashboardLayout";
+}
+
+<div class="page-head">
+    <div>
+        <h1>Messages</h1>
+        <p class="muted">Your conversations with employers and candidates.</p>
+    </div>
+</div>
+
+@if (!Model.Conversations.Any())
+{
+    <div class="card empty-state">
+        <h3>No conversations yet</h3>
+        <p>Start a conversation by messaging a candidate from the <strong>Applicants</strong> page, or an employer from a job detail page.</p>
+    </div>
+}
+else
+{
+    <div class="card convo-list">
+        @foreach (var c in Model.Conversations)
+        {
+            <a asp-action="Thread" asp-route-otherUserId="@c.OtherUserId" class="convo-item">
+                <div class="avatar sm">
+                    @if (!string.IsNullOrEmpty(c.OtherUserAvatar))
+                    { <img src="@c.OtherUserAvatar" alt="avatar" /> }
+                    else { <span>@c.OtherUserName.Substring(0, 1).ToUpper()</span> }
+                </div>
+                <div class="convo-body">
+                    <div class="convo-top">
+                        <strong>@c.OtherUserName</strong>
+                        <span class="muted">@c.LastMessageAt.ToString("dd MMM HH:mm")</span>
+                    </div>
+                    <div class="convo-preview">@c.LastMessage</div>
+                </div>
+                @if (c.UnreadCount > 0)
+                {
+                    <span class="sb-badge">@c.UnreadCount</span>
+                }
+            </a>
+        }
+    </div>
+}

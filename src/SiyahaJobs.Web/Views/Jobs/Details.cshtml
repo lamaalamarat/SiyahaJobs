@@ -47,6 +47,12 @@
                     <form asp-action="ToggleSave" asp-route-id="@job.Id" method="post" class="inline-form">
                         <button class="btn btn-outline" type="submit">@(Model.IsSaved ? "Unsave" : "Save job")</button>
                     </form>
+                    @if (!string.IsNullOrEmpty(job.Company?.OwnerUserId))
+                    {
+                        <a asp-controller="Messages" asp-action="Thread"
+                           asp-route-otherUserId="@job.Company.OwnerUserId"
+                           asp-route-jobId="@job.Id" class="btn btn-outline">Message employer</a>
+                    }
                 }
                 else if (!User.Identity.IsAuthenticated)
                 {
