@@ -17,7 +17,7 @@ public class JobSeekerDashboardViewModel
 
 public class EmployerDashboardViewModel
 {
-    public Company? Company { get; set; }
+    public SiyahaJobs.Web.Models.Entities.Company? Company { get; set; }
     public int TotalJobs { get; set; }
     public int ActiveJobs { get; set; }
     public int TotalApplicants { get; set; }
